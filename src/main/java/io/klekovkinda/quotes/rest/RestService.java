@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import io.klekovkinda.quotes.configuration.Settings;
-import io.klekovkinda.quotes.repository.InstrumentPriceRepository;
+import io.klekovkinda.quotes.repository.Repository;
 import org.glassfish.grizzly.http.util.HttpStatus;
 
 import java.io.IOException;
@@ -13,11 +13,11 @@ import java.nio.charset.StandardCharsets;
 
 public class RestService {
 
-    private final InstrumentPriceRepository repository;
+    private final Repository repository;
     private final ObjectMapper mapper;
     private HttpServer server;
 
-    public RestService(InstrumentPriceRepository repository) {
+    public RestService(Repository repository) {
         this.repository = repository;
         mapper = new ObjectMapper();
     }
@@ -30,9 +30,8 @@ public class RestService {
                 final String requestMethod = exchange.getRequestMethod().toUpperCase();
                 switch (requestMethod) {
                     case "GET":
-                        // do something with the request parameters
                         headers.set("Content-Type", String.format("application/json; charset=%s", StandardCharsets.UTF_8));
-                        String responseBody = mapper.writeValueAsString(repository.getInstrumentPrice());
+                        String responseBody = mapper.writeValueAsString(repository.getLatestInstrumentsPrice());
                         final byte[] rawResponseBody = responseBody.getBytes(StandardCharsets.UTF_8);
                         exchange.sendResponseHeaders(HttpStatus.OK_200.getStatusCode(), rawResponseBody.length);
                         exchange.getResponseBody().write(rawResponseBody);

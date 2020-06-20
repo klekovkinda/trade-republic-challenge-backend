@@ -1,6 +1,6 @@
 package io.klekovkinda.quotes.model;
 
-public class Instrument implements Payload {
+public class Instrument extends Payload {
     private String description;
     private String isin;
 

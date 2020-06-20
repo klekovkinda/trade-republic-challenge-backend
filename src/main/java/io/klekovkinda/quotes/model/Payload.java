@@ -1,5 +1,16 @@
 package io.klekovkinda.quotes.model;
 
-public interface Payload {
-    String getIsin();
+public abstract class Payload {
+    private final long timestamp;
+
+    protected Payload() {
+        timestamp = System.currentTimeMillis();
+    }
+
+    public abstract String getIsin();
+
+    public final long getTimestamp() {
+        return timestamp;
+    }
+
 }

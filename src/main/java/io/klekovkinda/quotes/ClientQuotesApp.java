@@ -6,6 +6,7 @@ import io.klekovkinda.quotes.model.Message;
 import io.klekovkinda.quotes.model.Quote;
 import io.klekovkinda.quotes.processor.MessageProcessor;
 import io.klekovkinda.quotes.repository.InstrumentPriceRepository;
+import io.klekovkinda.quotes.repository.Repository;
 import io.klekovkinda.quotes.rest.RestService;
 import io.klekovkinda.quotes.ws.AppEndpoint;
 import org.glassfish.tyrus.client.ClientManager;
@@ -23,9 +24,9 @@ public class ClientQuotesApp {
         };
         TypeReference<Message<Instrument>> instrumentTypeReference = new TypeReference<Message<Instrument>>() {
         };
-        InstrumentPriceRepository instrumentPriceRepository = new InstrumentPriceRepository();
-        MessageProcessor messageProcessor = new MessageProcessor(instrumentPriceRepository);
-        RestService restService = new RestService(instrumentPriceRepository);
+        Repository repository = new InstrumentPriceRepository();
+        MessageProcessor messageProcessor = new MessageProcessor(repository);
+        RestService restService = new RestService(repository);
         AppEndpoint<Quote> quotesEndpoint = new AppEndpoint<Quote>(quoteTypeReference, messageProcessor);
         AppEndpoint<Instrument> instrumentEndpoint = new AppEndpoint<Instrument>(instrumentTypeReference, messageProcessor);
         try {

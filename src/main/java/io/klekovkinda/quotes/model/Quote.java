@@ -2,7 +2,7 @@ package io.klekovkinda.quotes.model;
 
 import java.math.BigDecimal;
 
-public class Quote implements Payload {
+public class Quote extends Payload implements Comparable<Quote> {
     private BigDecimal price;
     private String isin;
 
@@ -20,5 +20,10 @@ public class Quote implements Payload {
 
     public void setIsin(String isin) {
         this.isin = isin;
+    }
+
+    @Override
+    public int compareTo(Quote o) {
+        return Long.compare(this.getTimestamp(), o.getTimestamp());
     }
 }
