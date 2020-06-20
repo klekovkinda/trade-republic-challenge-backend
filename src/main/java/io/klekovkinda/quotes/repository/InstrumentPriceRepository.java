@@ -1,19 +1,20 @@
 package io.klekovkinda.quotes.repository;
 
+import io.klekovkinda.quotes.model.CandleStick;
+import io.klekovkinda.quotes.model.InstrumentPrice;
 import io.klekovkinda.quotes.model.InstrumentPriceAggregation;
 import io.klekovkinda.quotes.model.Message;
 import io.klekovkinda.quotes.model.Payload;
 import io.klekovkinda.quotes.model.Quote;
 
-import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 public class InstrumentPriceRepository implements Repository {
 
-    private final ConcurrentMap<String, InstrumentPriceAggregation> instrumentsPrice;
+    private final Map<String, InstrumentPriceAggregation> instrumentsPrice;
 
     public InstrumentPriceRepository() {
         this.instrumentsPrice = new ConcurrentHashMap<String, InstrumentPriceAggregation>();
@@ -37,7 +38,14 @@ public class InstrumentPriceRepository implements Repository {
         }
     }
 
-    public synchronized List<Object> getLatestInstrumentsPrice() {
-        return instrumentsPrice.values().stream().filter(InstrumentPriceAggregation::isAvailableNow).map(value -> new AbstractMap.SimpleEntry(value.getInstrumentId(), value.getLastQuote())).collect(Collectors.toList());
+    public List<Object> getLatestInstrumentsPrice() {
+        return instrumentsPrice.values().stream()
+                .filter(InstrumentPriceAggregation::isAvailableNow)
+                .map(value -> new InstrumentPrice(value.getInstrumentId(), value.getLastQuote()))
+                .collect(Collectors.toList());
+    }
+
+    public List<CandleStick> getCandlesticks(String instrument) {
+        return instrumentsPrice.get(instrument).getCandleSticks();
     }
 }

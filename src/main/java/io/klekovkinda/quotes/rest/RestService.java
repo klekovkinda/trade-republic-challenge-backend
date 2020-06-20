@@ -1,15 +1,12 @@
 package io.klekovkinda.quotes.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
 import io.klekovkinda.quotes.configuration.Settings;
 import io.klekovkinda.quotes.repository.Repository;
-import org.glassfish.grizzly.http.util.HttpStatus;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 
 public class RestService {
 
@@ -24,27 +21,8 @@ public class RestService {
 
     public void start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(Settings.REST_SERVER_PORT), 0);
-        server.createContext("/instrument-price", exchange -> {
-            try {
-                final Headers headers = exchange.getResponseHeaders();
-                final String requestMethod = exchange.getRequestMethod().toUpperCase();
-                switch (requestMethod) {
-                    case "GET":
-                        headers.set("Content-Type", String.format("application/json; charset=%s", StandardCharsets.UTF_8));
-                        String responseBody = mapper.writeValueAsString(repository.getLatestInstrumentsPrice());
-                        final byte[] rawResponseBody = responseBody.getBytes(StandardCharsets.UTF_8);
-                        exchange.sendResponseHeaders(HttpStatus.OK_200.getStatusCode(), rawResponseBody.length);
-                        exchange.getResponseBody().write(rawResponseBody);
-                        break;
-                    default:
-                        headers.set("Allow", "GET");
-                        exchange.sendResponseHeaders(HttpStatus.METHOD_NOT_ALLOWED_405.getStatusCode(), -1);
-                        break;
-                }
-            } finally {
-                exchange.close();
-            }
-        });
+        server.createContext("/instrument-price", new InstrumentPriceHandler(mapper, repository));
+        server.createContext("/candlesticks", new CandlesticksHandler(mapper, repository));
         server.setExecutor(null);
         server.start();
     }
